@@ -87,5 +87,37 @@ class MultiHeadAttentionBlock (nn.Module):
         return (attention_score @ value) , attention_score
 
 
+class ResudianConnection (nn.Module):
+    def __init__(self  , dropout:float)->None:
+        super().__init__()
+        self.dropout = nn.Dropout(dropout)
+        self.norm = LayerNormalization()
+
+    def forward(self  , X , sublayer):
+        return  X + self.dropout(sublayer(self.norm(x)))
+
+class EncoderBlock(nn.Module):
+    def __init__(self , dropout:float , Self_Attention_Block : MultiHeadAttentionBlock , feed_froword_block : FeedForward)->None:
+        super().__init__()
+        self.self_attention_layer = Self_Attention_Layer  
+        self.feed_forword_layer = feed_froword_block
+
+        self.residual_connection = nn.ModuelList([ResudianConnection(dropout) for _ in range (2)])
+    def forword(self , X , src_mask):
+        X = self.residual_connection[0](x , lambda x : self.self_attention_layer(x ,x , x , src_mask))
+        X = self.residual_connection[1](x , self.feed_forward_layer())
+        return X
+
+class Encoder(nn.Module):
+    def __init__(self , layers:nn.ModuleList )->None:
+        super()__init__()
+        self.layer = layers
+        self.norm = layerNormalization()
+
+    def forward(self , x , mask):
+        for layer in self.layers::
+            x = layer(x , mask)
+        return x
+        
 
 
